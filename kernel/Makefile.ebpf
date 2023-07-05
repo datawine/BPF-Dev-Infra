@@ -1,0 +1,70 @@
+THIS_MAKEFILE := $(lastword $(MAKEFILE_LIST))
+ABS_THISDIR := $(realpath $(dir $(THIS_MAKEFILE)))
+
+UNAME_RELEASE = $(shell uname -r)
+objtree := /lib/modules/$(UNAME_RELEASE)/build
+
+USERINCLUDE := \
+ 	-isystem$(objtree)/arch/$(SRCARCH)/include/uapi \
+ 	-isystem$(objtree)/arch/$(SRCARCH)/include/generated/uapi \
+ 	-isystem$(objtree)/include/uapi \
+ 	-isystem$(objtree)/include/generated/uapi
+
+LINUXINCLUDE := \
+	-isystem$(objtree)/arch/$(SRCARCH)/include \
+ 	-isystem$(objtree)/arch/$(SRCARCH)/include/generated \
+ 	-isystem$(objtree)/include \
+	$(USERINCLUDE)
+
+CLANG		:=	clang
+LLC 		:=	llc
+OPT			:=  opt
+LLVM_DIS	:=	llvm-dis
+OBJDUMP		:=	llvm-objdump
+
+CLANG_FLAGS := \
+	-D__KERNEL__ \
+	-D__BPF_TRACING__ \
+	-D__x86_64__ -DUSE_SYSCALL_WRAPPER=1 \
+	-DCONFIG_64BIT \
+	-D__TARGET_ARCH_$(SRCARCH) \
+	-Wno-unused-value \
+	-Wno-pointer-sign \
+	-Wno-compare-distinct-pointer-types \
+	-Wunused \
+	-Wall \
+	-Werror
+
+CLANG_CMD := $(CLANG) $(CLANG_FLAGS) \
+	$(LINUXINCLUDE) \
+	-I$(ABS_THISDIR)/include \
+	-O2 -emit-llvm -Xclang -disable-llvm-passes
+
+OPT_CMD := $(OPT) -O2 -mtriple=bpf-pc-linux
+
+LLC_CMD := $(LLC) -march=bpf -filetype=obj
+
+sources	:= 	$(wildcard *.c)
+objects	:= 	$(patsubst %.c,%,$(sources))
+
+.PHONY: default check_dir_name clean
+
+default: check_dir_name $(objects)
+
+check_dir_name:
+ifeq ($(DIR_NAME),)
+	@echo "DIR_NAME is empty! Setting DIR_NAME to ./"
+else
+	@echo "building eBPF kernel process into" $(realpath $(DIR_NAME))
+endif
+
+DIR_NAME ?= .
+
+$(objects): %: %.c
+	mkdir -p $(DIR_NAME)/build
+	$(CLANG_CMD) $^ -c -g -o - | $(OPT_CMD) | $(LLVM_DIS) | $(LLC_CMD) -O2 -o $(DIR_NAME)/build/$@.o
+	$(OBJDUMP) --source --debug-vars --line-numbers --symbol-description $(DIR_NAME)/build/$@.o > $(DIR_NAME)/build/$@.objdump
+
+clean: 
+	-$(RM) -r $(DIR_NAME)/build
+
