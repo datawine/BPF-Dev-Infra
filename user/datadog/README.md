@@ -4,10 +4,20 @@ Reference: https://github.com/DataDog/ebpf-manager
 
 This directory is for test usage and validation of eBPF program loader.
 
-```bash
-# Run script with copying files from ../../kernel/build/helloworld/main.o to ./kernel/kernel.o
-sh run.sh ../../kernel/build/helloworld/main.o
+## Basic Requirements
 
-# Run script directly with ./kernel/kernel.o, without copying files
+- golang
+
+## Usage
+
+Run script with copying files from `../../kernel/src/helloworld/build/main.o` to `./kernel/kernel.o`.
+
+```bash
+mkdir
+sh run.sh ../../kernel/src/helloworld/build/main.o
+```
+
+Run script directly with `./kernel/kernel.o`, without copying files.
+```bash
 sh run.sh
 ```

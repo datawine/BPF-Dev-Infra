@@ -16,11 +16,11 @@ LINUXINCLUDE := \
  	-isystem$(objtree)/include \
 	$(USERINCLUDE)
 
-CLANG		:=	clang
-LLC 		:=	llc
-OPT			:=  opt
-LLVM_DIS	:=	llvm-dis
-OBJDUMP		:=	llvm-objdump
+CLANG		:=	clang-14
+LLC 		:=	llc-14
+OPT			:=  opt-14
+LLVM_DIS	:=	llvm-dis-14
+OBJDUMP		:=	llvm-objdump-14
 
 CLANG_FLAGS := \
 	-D__KERNEL__ \

@@ -22,15 +22,6 @@ var m = &manager.Manager{
 			},
 		},
 	},
-	// It seems that loading eBPF program does not need the following codes
-	// Maps: []*manager.Map{
-	// 	{
-	// 		Name: "map1",
-	// 		MapOptions: manager.MapOptions{
-	// 			PinPath: "/sys/fs/bpf/map1",
-	// 		},
-	// 	},
-	// },
 }
 
 func readTracePipe() {

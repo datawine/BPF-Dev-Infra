@@ -21,6 +21,3 @@ curl -sL "https://github.com/libbpf/libbpf/archive/refs/tags/v${LIBBPF_VERSION}.
 # Generating vmlinux.h, this works for kernel 5.15.0
 # Reference: https://github.com/libbpf/libbpf/blob/master/docs/libbpf_overview.rst
 bpftool btf dump file /sys/kernel/btf/vmlinux format c > ./include/vmlinux.h
-
-# Problem: I've coming up with the problem that the BPF_ANY is missing from vmlinux.h generated from the above command under kernel 5.4.0.
-# I give this up, and copy from ./3rdparty/libbpf-bootstrap/vmlinux/x86/vmlinux_601.h to ./include/vmlinux.h

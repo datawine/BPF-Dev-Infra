@@ -1,5 +1,7 @@
 #!/bin/sh
 
+mkdir -p ./kernel
+
 if [ -z "$1" ]; then
     echo "Directly loading ./kernel/kernel.o"
 else
@@ -8,12 +10,6 @@ else
     cp $1 ./kernel/kernel.o
 fi
 
-# if [ ! -f "go.sum" ]; then
-#     echo "Generating go module"
-#     go mod tidy
-# else
-#     echo "go.sum exists"
-# fi
 go mod tidy
 
 echo "Building ebpf-manager with embeded ./kernel/kernel.o"
